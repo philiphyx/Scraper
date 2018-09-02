@@ -64,8 +64,8 @@ Soup = bs(html_data, 'html.parser')
 
 
 
-BookTitle = []
-Rates = []
+MovieName = []
+MovieType = []
 RatePerson = []
 
 
@@ -74,19 +74,39 @@ for link in Soup.find_all('table', class_='tbspan'):
     z = link.find_all('a')
     #print(z[1])
     x = z[1].get_text().encode("latin1").decode("gbk")
-    # content = bytes(x, "UTF-8")
-    # content = content.decode("UTF-8")
-    # print(content)
-    #BookTitle.append(z.get('title'))   #获取属性中的书的名字
-    BookTitle.append(x)
 
-print(len(BookTitle))
+    MName = re.compile(r'(?<=《)[^》]+(?=》)')   #去掉书名号，纯文字
+    #pt= re.compile(r'《[^》]+》')    包含书名号，下同
+    #pt = re.compile(r'《.*》')
+    #match实在开头匹配
+    #re.sub(pattern, repl, string[, count])    使用repl替换string中每一个匹配的子串后返回替换后的字符串
+    ##########################
+    MName = re.search(MName, x).group()  #
+    #print(MName)
+#########################################
+    # num = re.findall(pt,x)  #以列表形式返回全部能匹配的子串
+    # print(num)
+#####################################
+
+    MovieName.append(MName)
+####################
+    Mtype = re.compile(r'(?<=年).*(?=《)')
+    Mtype = re.search(Mtype, x).group()  #
+    print(Mtype)
+    MovieType.append(Mtype)
+#####################################
+#print(len(MovieName))
 print(sys.getfilesystemencoding())
 
 
 ###############################################################
-pd_Movies = pd.Series(BookTitle)
-pd_Movies.to_csv('movies.csv')  #  ,encoding="utf_8_sig"
+pd_Movies = pd.Series(MovieName)
+pd_Mtype = pd.Series(MovieType)
+
+pd_Movies_All = pd.DataFrame({'Movies_Name' : pd_Movies,'Movies_Type': pd_Mtype})
+
+
+pd_Movies_All.to_csv('movies.csv',encoding="utf_8_sig")  #  ,encoding="utf_8_sig"
 #DataFrame处理数据
 # pd_Rates = pd.Series(Rates,index=[BookTitle])
 # pd_RatePerson = pd.Series(RatePerson,index=[BookTitle])
