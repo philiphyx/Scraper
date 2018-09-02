@@ -66,14 +66,21 @@ Soup = bs(html_data, 'html.parser')
 
 MovieName = []
 MovieType = []
-RatePerson = []
+MovieUrl = []
 
 
 for link in Soup.find_all('table', class_='tbspan'):
 
     z = link.find_all('a')
     #print(z[1])
+#############################################################
+    MUrl = z[1].get('href')
+    MUrl = 'http://www.ygdy8.net' + MUrl
+    MovieUrl.append(MUrl)
+#############################################################
+
     x = z[1].get_text().encode("latin1").decode("gbk")
+
 
     MName = re.compile(r'(?<=《)[^》]+(?=》)')   #去掉书名号，纯文字
     #pt= re.compile(r'《[^》]+》')    包含书名号，下同
@@ -95,6 +102,8 @@ for link in Soup.find_all('table', class_='tbspan'):
     print(Mtype)
     MovieType.append(Mtype)
 #####################################
+
+
 #print(len(MovieName))
 print(sys.getfilesystemencoding())
 
@@ -102,8 +111,9 @@ print(sys.getfilesystemencoding())
 ###############################################################
 pd_Movies = pd.Series(MovieName)
 pd_Mtype = pd.Series(MovieType)
-
-pd_Movies_All = pd.DataFrame({'Movies_Name' : pd_Movies,'Movies_Type': pd_Mtype})
+pd_MovieUrl = pd.Series(MovieUrl)
+pd_Movies_All = pd.DataFrame({'Movies_Name' : pd_Movies,'Movies_Type': pd_Mtype,
+                              'Movie_Url' : pd_MovieUrl})
 
 
 pd_Movies_All.to_csv('movies.csv',encoding="utf_8_sig")  #  ,encoding="utf_8_sig"
