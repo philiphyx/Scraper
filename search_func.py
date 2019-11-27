@@ -8,8 +8,9 @@ import urllib
 import re
 import pandas as pd
 import numpy as np
+# from bs4 import BeautifulSoup4 as bs
 from bs4 import BeautifulSoup as bs
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup4
 import requests
 import random
 
@@ -17,7 +18,17 @@ import random
 #url = "https://book.douban.com/tag/python"
 #url = "https://book.douban.com/tag/python?start=160&type=T"
 
-
+def get_agent():
+    # 模拟header的user-agent字段，返回一个随机的user-agent字典类型的键值对
+    agents = ['Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0;',
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv,2.0.1) Gecko/20100101 Firefox/4.0.1',
+              'Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; en) Presto/2.8.131 Version/11.11',
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) '
+              'Chrome/17.0.963.56 Safari/535.11',
+              'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; 360SE)']
+    fakeheader = {}
+    fakeheader['User-agent'] = agents[random.randint(0, len(agents)-1)]
+    return fakeheader
 #####################################################################
 # def get_ip_list(url, headers):
 #     web_data = requests.get(url, headers=headers)
@@ -52,12 +63,12 @@ Rates = []
 RatePerson = []
 BookUrl = []
 
-for i in range(0,20):
+for i in range(0,5):
 #url = "https://book.douban.com/tag/python?start=160&type=T"
     # html_data = requests.get("https://book.douban.com/tag/概率?start="+ str(
     #     20 * i) + "&type=S", headers=headers, proxies=proxies)
-    html_data = requests.get("https://book.douban.com/tag/概率?start="+ str(
-        20 * i) + "&type=S")
+    html_data = requests.get("https://book.douban.com/tag/pytorch?start="+ str(
+        20 * i) + "&type=S", timeout=30, headers=get_agent())
     html_data = html_data.text
     Soup = bs(html_data, 'html.parser')
 
@@ -95,7 +106,7 @@ for i in range(0,20):
     print("第"+ str(i+1) + "页爬取完毕...")
 
 print("爬取完成！！！")
-    #DataFrame处理数据
+#DataFrame处理数据
 pd_Rates = pd.Series(Rates,index=[BookTitle])
 pd_RatePerson = pd.Series(RatePerson,index=[BookTitle])
 pd_BookUrl = pd.Series(BookUrl,index=[BookTitle])
@@ -114,8 +125,8 @@ All_Books = pd.DataFrame({'Rates' : pd_Rates,'RatePerson': pd_RatePerson,'Book_U
     # print(All_Books.Rates)
     #print(All_Books.values)
 # X = All_Books[All_Books.Rates> 8.0]  #要注意比较的类型！！
-X= All_Books[(All_Books.Rates>7.9) &(All_Books.RatePerson>100)]
+X= All_Books
+# X= All_Books[(All_Books.Rates>8.0) &(All_Books.RatePerson>200)]
 X = X.sort_values(by = ['Rates'],axis = 0,ascending = False)
-# print(X)
 X.to_csv("data.csv",encoding="utf_8_sig")
     ##############################################################
